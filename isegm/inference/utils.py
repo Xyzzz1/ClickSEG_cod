@@ -4,7 +4,8 @@ from pathlib import Path
 import torch
 import numpy as np
 
-from isegm.data.datasets import GrabCutDataset, BerkeleyDataset, DavisDataset, SBDEvaluationDataset, PascalVocDataset, Davis585Dataset, COCOMValDataset
+from isegm.data.datasets import GrabCutDataset, BerkeleyDataset, DavisDataset, SBDEvaluationDataset, PascalVocDataset, \
+    Davis585Dataset, COCOMValDataset, CODEvaluationDataset
 
 from isegm.utils.serialization import load_model
 
@@ -35,7 +36,7 @@ def load_is_model(checkpoint, device, **kwargs):
 
 
 def load_single_is_model(state_dict, device, **kwargs):
-    #print(state_dict['config'], **kwargs )
+    # print(state_dict['config'], **kwargs )
     model = load_model(state_dict['config'], **kwargs)
     model.load_state_dict(state_dict['state_dict'], strict=False)
 
@@ -56,6 +57,8 @@ def get_dataset(dataset_name, cfg):
         dataset = DavisDataset(cfg.DAVIS_PATH)
     elif dataset_name == 'SBD':
         dataset = SBDEvaluationDataset(cfg.SBD_PATH)
+    elif dataset_name == 'COD':
+        dataset = CODEvaluationDataset(cfg.COD_PATH)
     elif dataset_name == 'SBD_Train':
         dataset = SBDEvaluationDataset(cfg.SBD_PATH, split='train')
     elif dataset_name == 'PascalVOC':
@@ -130,7 +133,7 @@ def get_results_table(noc_list, over_max_list, brs_type, dataset_name, mean_spc,
                       n_clicks=20, model_name=None):
     table_header = (f'|{"Pipeline":^13}|{"Dataset":^11}|'
                     f'{"NoC@80%":^9}|{"NoC@85%":^9}|{"NoC@90%":^9}|'
-                    f'{">="+str(n_clicks)+"@85%":^9}|{">="+str(n_clicks)+"@90%":^9}|'
+                    f'{">=" + str(n_clicks) + "@85%":^9}|{">=" + str(n_clicks) + "@90%":^9}|'
                     f'{"SPC,s":^7}|{"Time":^9}|')
     row_width = len(table_header)
 

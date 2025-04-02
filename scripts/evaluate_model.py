@@ -18,7 +18,7 @@ from isegm.inference.evaluation import evaluate_dataset
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('mode', choices=[ 'CDNet', 'Baseline', 'FocalClick', 'NoBRS', 'RGB-BRS', 'DistMap-BRS',
+    parser.add_argument('mode', choices=['CDNet', 'Baseline', 'FocalClick', 'NoBRS', 'RGB-BRS', 'DistMap-BRS',
                                          'f-BRS-A', 'f-BRS-B', 'f-BRS-C'],
                         help='')
 
@@ -29,7 +29,7 @@ def parse_args():
                                         'or an absolute path. The file extension can be omitted.')
 
     parser.add_argument('--model_dir', type=str, default='',
-                                   help='The path to the checkpoint.')
+                        help='The path to the checkpoint.')
 
     group_checkpoints.add_argument('--exp-path', type=str, default='',
                                    help='The relative path to the experiment with checkpoints.'
@@ -64,7 +64,7 @@ def parse_args():
 
     parser.add_argument('--save-ious', action='store_true', default=False)
     parser.add_argument('--print-ious', action='store_true', default=False)
-    parser.add_argument('--vis', action='store_true', default=False)
+    parser.add_argument('--vis', action='store_true', default=True)
     group_checkpoints.add_argument('--vis_path', type=str, default='./experiments/vis_val/',
                                    help='saveing path for the evaluation results')
     parser.add_argument('--model-name', type=str, default=None,
@@ -77,10 +77,10 @@ def parse_args():
                         help='Inference input size for the model')
 
     parser.add_argument('--target-crop-r', type=float, default=1.40,
-                                  help='Target Crop Expand Ratio')
-    
+                        help='Target Crop Expand Ratio')
+
     parser.add_argument('--focus-crop-r', type=float, default=1.40,
-                                  help='Focus Crop Expand Ratio')
+                        help='Focus Crop Expand Ratio')
 
     args = parser.parse_args()
     if args.cpu:
@@ -117,7 +117,7 @@ def main():
     print_header = single_model_eval
     for dataset_name in args.datasets.split(','):
         dataset = utils.get_dataset(dataset_name, cfg)
-        #print(dataset_name)
+        # print(dataset_name)
 
         for checkpoint_path in checkpoints_list:
             model = utils.load_is_model(checkpoint_path, args.device)
@@ -127,11 +127,11 @@ def main():
                                       infer_size=args.infer_size,
                                       prob_thresh=args.thresh,
                                       predictor_params=predictor_params,
-                                      focus_crop_r = args.focus_crop_r,
-                                      #zoom_in_params=None)
+                                      focus_crop_r=args.focus_crop_r,
+                                      # zoom_in_params=None)
                                       zoom_in_params=zoomin_params)
 
-            #vis_callback = get_prediction_vis_callback(logs_path, dataset_name, args.thresh) if args.vis else None
+            # vis_callback = get_prediction_vis_callback(logs_path, dataset_name, args.thresh) if args.vis else None
             dataset_results = evaluate_dataset(dataset, predictor, pred_thr=args.thresh,
                                                max_iou_thr=args.target_iou,
                                                min_clicks=args.min_n_clicks,
@@ -202,7 +202,7 @@ def get_checkpoints_list_and_logs_path(args, cfg):
 
         logs_path = args.logs_path / exp_path.relative_to(cfg.EXPS_PATH)
     else:
-        #checkpoints_list = [Path(utils.find_checkpoint(cfg.INTERACTIVE_MODELS_PATH, args.checkpoint))]
+        # checkpoints_list = [Path(utils.find_checkpoint(cfg.INTERACTIVE_MODELS_PATH, args.checkpoint))]
         checkpoints_list = [Path(utils.find_checkpoint(args.model_dir, args.checkpoint))]
         logs_path = args.logs_path / 'others' / checkpoints_list[0].stem
 
@@ -212,7 +212,7 @@ def get_checkpoints_list_and_logs_path(args, cfg):
 def save_results(args, row_name, dataset_name, logs_path, logs_prefix, dataset_results,
                  save_ious=False, print_header=True, single_model_eval=False):
     all_ious, elapsed_time = dataset_results
-    #print(all_ious)
+    # print(all_ious)
     mean_spc, mean_spi = utils.get_time_metrics(all_ious, elapsed_time)
 
     iou_thrs = np.arange(0.8, min(0.95, args.target_iou) + 0.001, 0.05).tolist()
